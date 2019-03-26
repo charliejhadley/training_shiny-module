@@ -28,3 +28,26 @@ gg_ma_timeseries <- function(.data, date, value, category) {
       title = "Example dataviz of Online Labour Index data",
       subtitle = "DOI:10.6084/m9.figshare.376156")
 }
+
+ma_job_count <- function(.data, date, value, category, window_width){
+  
+  date <- enquo(date)
+  
+  value <- enquo(value)
+  
+  category <- enquo(category)
+  
+  window_width <- as.numeric(window_width)
+  
+  .data %>%
+    group_by(!!category) %>%
+    arrange(!!date) %>%
+    mutate(!!value := rollmean(!!value,
+                               k = window_width,
+                               na.pad = TRUE,
+                               align = "right"
+    )) %>%
+    filter(!is.na(!!value)) %>%
+    ungroup()
+  
+}
